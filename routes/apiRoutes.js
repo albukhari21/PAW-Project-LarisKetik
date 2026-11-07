@@ -1,9 +1,13 @@
+// routes/apiRoutes.js
 const express = require('express');
 const router = express.Router();
 const apiController = require('../controllers/apiController');
 
-// Endpoint API sesuai instruksi praktikum
 router.get('/status', apiController.getStatus);
-router.get('/produk', apiController.getProduk);
+router.get('/produk', apiController.getAllProduk);
+router.get('/produk/:id', apiController.getProdukById);
+router.post('/produk', apiController.createProduk);
+router.put('/produk/:id', apiController.updateProduk);
+router.delete('/produk/:id', apiController.deleteProduk);
 
 module.exports = router;
