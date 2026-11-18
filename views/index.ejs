@@ -447,7 +447,14 @@
       }
 
       const hargaFormat = !isNaN(harga) ? `Rp ${harga.toLocaleString('id-ID')}` : 'terjangkau';
-      const promptAI = `Tolong buatkan 1 draf caption promosi yang persuasif dan siap pakai untuk produk "${nama}", pemilik "${pemilik || 'UMKM'}", target media "${media}", harga "${hargaFormat}", dan keunggulan: "${keunggulan}". Berikan langsung teks caption-nya saja dengan rapi dan menarik.`;
+      const promptAI = `[MODE GENERATE CAPTION] Tolong racikkan 1 draf caption promosi siap pakai untuk produk baru UMKM berikut:
+- Nama Produk: ${nama}
+- Pemilik Toko: ${pemilik || 'UMKM'}
+- Target Media: ${media}
+- Harga: ${hargaFormat}
+- Keunggulan: ${keunggulan}
+
+Instruksi: Berikan LANGSUNG isi teks caption promosi lengkap dengan headline, emoji, dan call-to-action yang menarik sesuai target media. Jangan sertakan kata pengantar, basa-basi, atau salam penutup.`;
 
       btnRacik.disabled = true;
       btnRacik.innerHTML = `<span>⏳ Meracik AI...</span>`;
