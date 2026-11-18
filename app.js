@@ -5,6 +5,7 @@ const config = require('./config/appConfig');
 const requestLogger = require('./middlewares/logger');
 const apiRoutes = require('./routes/apiRoutes');
 const webRoutes = require('./routes/webRoutes');
+const chatRoutes = require('./routes/chat.routes');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(requestLogger);
 // Pasang Routes
 app.use('/', webRoutes);
 app.use('/api', apiRoutes);
+app.use('/api', chatRoutes);
 
 // Handler 404 (Route tidak ditemukan)
 app.use((req, res) => {
@@ -55,5 +57,6 @@ app.listen(config.port, () => {
   console.log(`🚀 Server berjalan di http://localhost:${config.port}`);
   console.log(`📡 Endpoint API Status : http://localhost:${config.port}/api/status`);
   console.log(`📦 Endpoint API Produk : http://localhost:${config.port}/api/produk`);
+  console.log(`🤖 Endpoint AI Chatbot : http://localhost:${config.port}/api/chat`);
   console.log(`====================================================`);
 });
