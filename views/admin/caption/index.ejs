@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-amber-50/30 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Admin Nav -->
+  <%- include('../../partials/adminNav') %>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-black text-emerald-950 tracking-tight flex items-center gap-2">
+          <span>✍️</span> Generator Caption Promosi AI
+        </h1>
+        <p class="text-xs text-slate-500 mt-1">
+          Bantu Bu Wati meracik takarir promosi otomatis untuk WhatsApp, Instagram, dan TikTok berdasarkan data jamu Seduh Rimba.
+        </p>
+      </div>
+      <a href="/admin/produk" class="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 transition">
+        &larr; Kembali ke Katalog Produk
+      </a>
+    </div>
+
+    <!-- Alert Notifikasi -->
+    <% if (success) { %>
+      <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-base">✓</span>
+          <span><%= success %></span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 font-bold">&times;</button>
+      </div>
+    <% } %>
+
+    <% if (error) { %>
+      <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-base">⚠️</span>
+          <span><%= error %></span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-900 font-bold">&times;</button>
+      </div>
+    <% } %>
+
+    <!-- Area Kerja Generator Caption (Grid 2 Kolom) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Kolom Kiri: Form Input Generator (5 Cols) -->
+      <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-emerald-100 shadow-xs space-y-5">
+        <h2 class="text-sm font-bold text-emerald-950 flex items-center gap-2 border-b border-slate-100 pb-3">
+          <span>⚙️</span> Parameter Pembuatan Caption
+        </h2>
+
+        <form id="captionForm" onsubmit="handleGenerateCaption(event)" class="space-y-4">
+          <!-- 1. Pilih Produk -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Pilih Produk Jamu <span class="text-rose-500">*</span>
+            </label>
+            <select id="genProdukId" name="produk_id" required class="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+              <option value="">-- Pilih Jamu yang Ingin Dipromosikan --</option>
+              <% products.forEach(function(p) { %>
+                <option value="<%= p.id %>" <%= String(selectedProductId) === String(p.id) ? 'selected' : '' %>>
+                  <%= p.nama_produk %> (<%= p.ukuran %> - Rp<%= Number(p.harga).toLocaleString('id-ID') %>)
+                </option>
+              <% }); %>
+            </select>
+          </div>
+
+          <!-- 2. Pilih Platform Media Sosial -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-2">
+              Target Platform Media <span class="text-rose-500">*</span>
+            </label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="platform" value="whatsapp" checked class="peer sr-only">
+                <div class="p-3 text-center rounded-xl border border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 peer-checked:text-emerald-900 hover:bg-slate-50 transition">
+                  <span class="text-lg block">💬</span>
+                  <span class="text-[11px] font-bold block mt-1">WhatsApp</span>
+                  <span class="text-[9px] text-slate-400 block">Broadcast</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="platform" value="instagram" class="peer sr-only">
+                <div class="p-3 text-center rounded-xl border border-slate-200 peer-checked:border-pink-600 peer-checked:bg-pink-50 peer-checked:text-pink-900 hover:bg-slate-50 transition">
+                  <span class="text-lg block">📸</span>
+                  <span class="text-[11px] font-bold block mt-1">Instagram</span>
+                  <span class="text-[9px] text-slate-400 block">Storytelling</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="platform" value="tiktok" class="peer sr-only">
+                <div class="p-3 text-center rounded-xl border border-slate-200 peer-checked:border-slate-800 peer-checked:bg-slate-100 peer-checked:text-slate-900 hover:bg-slate-50 transition">
+                  <span class="text-lg block">🎵</span>
+                  <span class="text-[11px] font-bold block mt-1">TikTok</span>
+                  <span class="text-[9px] text-slate-400 block">Hook Energik</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. Pilih Gaya Bahasa -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Gaya Bahasa Penulisan <span class="text-rose-500">*</span>
+            </label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="gaya" value="santai" checked class="peer sr-only">
+                <div class="p-2 text-center rounded-xl border border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 peer-checked:text-emerald-900 text-xs font-semibold hover:bg-slate-50 transition">
+                  Santai & Hangat
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="gaya" value="formal" class="peer sr-only">
+                <div class="p-2 text-center rounded-xl border border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 peer-checked:text-emerald-900 text-xs font-semibold hover:bg-slate-50 transition">
+                  Formal & Kredibel
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="gaya" value="promo" class="peer sr-only">
+                <div class="p-2 text-center rounded-xl border border-slate-200 peer-checked:border-amber-600 peer-checked:bg-amber-50 peer-checked:text-amber-900 text-xs font-semibold hover:bg-slate-50 transition">
+                  Promo & Diskon
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- 4. Catatan Tambahan (Opsional) -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Catatan Khusus Promosi (Opsional)
+            </label>
+            <input 
+              type="text" 
+              id="genCatatan"
+              name="catatan" 
+              placeholder="Contoh: Promo akhir pekan beli 2 gratis ongkir, stok sisa 5 botol..." 
+              class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none"
+            >
+            <span class="text-[10px] text-slate-400 mt-1 block">AI akan menyisipkan penawaran ini ke dalam caption.</span>
+          </div>
+
+          <!-- Tombol Generate -->
+          <button 
+            type="submit" 
+            id="btnGenerate"
+            class="w-full py-3 px-4 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
+            <span>✨</span>
+            <span id="btnGenText">Racik Caption Promosi dengan AI</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Kolom Kanan: Hasil Racikan & Aksi Simpan (7 Cols) -->
+      <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-emerald-100 shadow-xs flex flex-col space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-sm">📝</span>
+            <h2 class="text-sm font-bold text-emerald-950">Hasil Caption Siap Pakai</h2>
+          </div>
+          <span id="genStatusBadge" class="text-[10px] bg-slate-100 text-slate-500 font-semibold px-2.5 py-0.5 rounded-full">
+            Menunggu input
+          </span>
+        </div>
+
+        <!-- Textarea Hasil (Bisa Diedit Bebas oleh Bu Wati) -->
+        <div class="relative flex-1">
+          <textarea 
+            id="captionResultText" 
+            rows="12" 
+            placeholder="Pilih produk dan klik tombol 'Racik Caption Promosi dengan AI' di sebelah kiri. Teks caption yang dihasilkan akan muncul di sini dan dapat Anda edit sebelum disimpan atau disalin..."
+            class="w-full h-full min-h-[260px] p-4 text-xs text-slate-800 bg-slate-50/70 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none resize-y leading-relaxed font-sans"
+          ></textarea>
+        </div>
+
+        <!-- Tombol Aksi: Salin & Simpan ke Riwayat -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <div class="text-[11px] text-slate-400">
+            <span id="charCounter">0</span> karakter
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <!-- Tombol Salin -->
+            <button 
+              type="button" 
+              id="btnCopyCaption" 
+              onclick="copyGeneratedCaption()"
+              disabled
+              class="flex-1 sm:flex-initial px-4 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+              <span>📋</span>
+              <span id="btnCopyText">Salin Teks</span>
+            </button>
+
+            <!-- Tombol Simpan ke Riwayat -->
+            <button 
+              type="button" 
+              id="btnSaveLog" 
+              onclick="saveCaptionToHistory()"
+              disabled
+              class="flex-1 sm:flex-initial px-4 py-2 text-xs font-bold text-white bg-emerald-800 hover:bg-emerald-900 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+              <span>💾</span>
+              <span id="btnSaveText">Simpan ke Riwayat</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="saveToast" class="hidden p-3 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-semibold items-center justify-between">
+          <span id="saveToastMsg">Berhasil disimpan!</span>
+          <button onclick="this.parentElement.classList.add('hidden')" class="font-bold">&times;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Riwayat Caption Tersimpan (caption_log) -->
+    <div class="bg-white rounded-3xl border border-emerald-100 shadow-xs overflow-hidden space-y-4 p-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h2 class="text-sm font-bold text-emerald-950 flex items-center gap-2">
+            <span>📚</span> Riwayat Caption Tersimpan (<%= captionLogs.length %>)
+          </h2>
+          <p class="text-[11px] text-slate-500 mt-0.5">Daftar takarir promosi yang pernah disimpan Bu Wati.</p>
+        </div>
+
+        <!-- Filter Riwayat per Produk -->
+        <form action="/admin/caption" method="GET" class="flex items-center gap-2 text-xs">
+          <span class="text-slate-400">Filter Produk:</span>
+          <select name="produk_id" onchange="this.form.submit()" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-600">
+            <option value="">Semua Produk</option>
+            <% products.forEach(function(p) { %>
+              <option value="<%= p.id %>" <%= String(selectedProductId) === String(p.id) ? 'selected' : '' %>>
+                <%= p.nama_produk %>
+              </option>
+            <% }); %>
+          </select>
+          <% if (selectedProductId) { %>
+            <a href="/admin/caption" class="px-2 py-1 text-[11px] text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200">Reset</a>
+          <% } %>
+        </form>
+      </div>
+
+      <!-- Daftar Riwayat -->
+      <% if (captionLogs.length === 0) { %>
+        <div class="p-8 text-center text-xs text-slate-400">
+          Belum ada riwayat caption promosi tersimpan untuk produk ini. Racik dan klik "Simpan ke Riwayat" di atas.
+        </div>
+      <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% captionLogs.forEach(function(log) { %>
+            <div class="bg-amber-50/20 rounded-2xl border border-emerald-100 p-4 space-y-3 flex flex-col justify-between hover:border-emerald-300 transition">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-bold text-xs text-emerald-950 truncate"><%= log.nama_produk %></span>
+                  
+                  <div class="flex items-center gap-1 shrink-0">
+                    <!-- Badge Platform -->
+                    <% if (log.platform === 'whatsapp') { %>
+                      <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">WhatsApp</span>
+                    <% } else if (log.platform === 'instagram') { %>
+                      <span class="text-[10px] font-bold bg-pink-100 text-pink-800 px-2 py-0.5 rounded-full">Instagram</span>
+                    <% } else { %>
+                      <span class="text-[10px] font-bold bg-slate-200 text-slate-800 px-2 py-0.5 rounded-full">TikTok</span>
+                    <% } %>
+
+                    <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full capitalize">
+                      <%= log.gaya %>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Cuplikan Isi Caption -->
+                <p class="text-xs text-slate-600 line-clamp-4 leading-relaxed font-sans bg-white p-3 rounded-xl border border-slate-100 whitespace-pre-line" id="logText_<%= log.id %>">
+<%= log.isi_caption %>
+                </p>
+              </div>
+
+              <!-- Info Waktu & Aksi -->
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <span><%= new Date(log.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+
+                <div class="flex items-center gap-2">
+                  <button 
+                    type="button" 
+                    onclick="copyLogText('logText_<%= log.id %>', this)"
+                    class="px-2.5 py-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition cursor-pointer">
+                    Salin
+                  </button>
+
+                  <button 
+                    type="button"
+                    onclick="loadToEditor('logText_<%= log.id %>', '<%= log.produk_id %>', '<%= log.platform %>', '<%= log.gaya %>')"
+                    class="px-2.5 py-1 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg transition cursor-pointer">
+                    Pakai di Editor
+                  </button>
+
+                  <form action="/admin/caption/hapus/<%= log.id %>" method="POST" onsubmit="return confirm('Hapus riwayat caption ini?');">
+                    <button type="submit" class="p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Hapus riwayat">
+                      🗑️
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <script>
+    const textarea = document.getElementById('captionResultText');
+    const counter = document.getElementById('charCounter');
+    const btnCopy = document.getElementById('btnCopyCaption');
+    const btnSave = document.getElementById('btnSaveLog');
+    const statusBadge = document.getElementById('genStatusBadge');
+
+    textarea.addEventListener('input', () => {
+      counter.textContent = textarea.value.length;
+      if (textarea.value.trim().length > 0) {
+        btnCopy.disabled = false;
+        btnSave.disabled = false;
+      } else {
+        btnCopy.disabled = true;
+        btnSave.disabled = true;
+      }
+    });
+
+    async function handleGenerateCaption(e) {
+      e.preventDefault();
+      const produkId = document.getElementById('genProdukId').value;
+      const platform = document.querySelector('input[name="platform"]:checked')?.value || 'whatsapp';
+      const gaya = document.querySelector('input[name="gaya"]:checked')?.value || 'santai';
+      const catatan = document.getElementById('genCatatan').value;
+
+      if (!produkId) {
+        alert('Silakan pilih produk jamu terlebih dahulu.');
+        return;
+      }
+
+      const btnGen = document.getElementById('btnGenerate');
+      const btnText = document.getElementById('btnGenText');
+      btnGen.disabled = true;
+      btnText.textContent = 'Meracik caption dengan AI... 🌿';
+      statusBadge.textContent = 'Memproses...';
+      statusBadge.className = 'text-[10px] bg-amber-100 text-amber-800 font-semibold px-2.5 py-0.5 rounded-full animate-pulse';
+
+      try {
+        const response = await fetch('/admin/caption/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ produk_id: produkId, platform, gaya, catatan })
+        });
+
+        const data = await response.json();
+        btnGen.disabled = false;
+        btnText.textContent = 'Racik Caption Promosi dengan AI';
+
+        if (data.success && data.caption) {
+          textarea.value = data.caption;
+          counter.textContent = data.caption.length;
+          btnCopy.disabled = false;
+          btnSave.disabled = false;
+          statusBadge.textContent = 'Selesai diracik ✨';
+          statusBadge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full';
+        } else {
+          alert('Gagal meracik caption: ' + (data.message || 'Terjadi kesalahan sistem'));
+          statusBadge.textContent = 'Gagal';
+          statusBadge.className = 'text-[10px] bg-rose-100 text-rose-800 font-semibold px-2.5 py-0.5 rounded-full';
+        }
+      } catch (err) {
+        btnGen.disabled = false;
+        btnText.textContent = 'Racik Caption Promosi dengan AI';
+        alert('Terjadi kesalahan koneksi saat memanggil AI: ' + err.message);
+        statusBadge.textContent = 'Error koneksi';
+      }
+    }
+
+    function copyGeneratedCaption() {
+      if (!textarea.value) return;
+      navigator.clipboard.writeText(textarea.value).then(() => {
+        const copyText = document.getElementById('btnCopyText');
+        const original = copyText.textContent;
+        copyText.textContent = 'Tersalin! ✓';
+        setTimeout(() => { copyText.textContent = original; }, 2000);
+      });
+    }
+
+    async function saveCaptionToHistory() {
+      const produkId = document.getElementById('genProdukId').value;
+      const platform = document.querySelector('input[name="platform"]:checked')?.value || 'whatsapp';
+      const gaya = document.querySelector('input[name="gaya"]:checked')?.value || 'santai';
+      const isiCaption = textarea.value.trim();
+
+      if (!produkId || !isiCaption) {
+        alert('Pastikan produk telah dipilih dan teks caption tidak kosong.');
+        return;
+      }
+
+      btnSave.disabled = true;
+      document.getElementById('btnSaveText').textContent = 'Menyimpan...';
+
+      try {
+        const res = await fetch('/admin/caption/simpan', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            produk_id: produkId,
+            platform,
+            gaya,
+            isi_caption: isiCaption
+          })
+        });
+
+        const data = await res.json();
+        btnSave.disabled = false;
+        document.getElementById('btnSaveText').textContent = 'Simpan ke Riwayat';
+
+        if (data.success) {
+          const toast = document.getElementById('saveToast');
+          const toastMsg = document.getElementById('saveToastMsg');
+          toastMsg.textContent = '✓ ' + (data.message || 'Caption berhasil disimpan ke riwayat!');
+          toast.classList.remove('hidden');
+          toast.classList.add('flex');
+          // Reload riwayat setelah 1 detik agar riwayat langsung muncul
+          setTimeout(() => { window.location.reload(); }, 1200);
+        } else {
+          alert('Gagal menyimpan: ' + data.message);
+        }
+      } catch (e) {
+        btnSave.disabled = false;
+        document.getElementById('btnSaveText').textContent = 'Simpan ke Riwayat';
+        alert('Gagal menyimpan caption: ' + e.message);
+      }
+    }
+
+    function copyLogText(elementId, btn) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText.trim()).then(() => {
+        const originalText = btn.textContent;
+        btn.textContent = 'Tersalin!';
+        setTimeout(() => { btn.textContent = originalText; }, 1500);
+      });
+    }
+
+    function loadToEditor(elementId, produkId, platform, gaya) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      textarea.value = el.innerText.trim();
+      counter.textContent = textarea.value.length;
+      btnCopy.disabled = false;
+      btnSave.disabled = false;
+
+      // Update dropdown produk
+      const selProduk = document.getElementById('genProdukId');
+      if (selProduk) selProduk.value = produkId;
+
+      // Update platform radio
+      const radPlatform = document.querySelector(`input[name="platform"][value="${platform}"]`);
+      if (radPlatform) radPlatform.checked = true;
+
+      // Update gaya radio
+      const radGaya = document.querySelector(`input[name="gaya"][value="${gaya}"]`);
+      if (radGaya) radGaya.checked = true;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+  <footer class="mt-auto py-6 text-center text-xs text-slate-400 border-t border-emerald-900/10">
+    &copy; <%= new Date().getFullYear() %> Seduh Rimba &bull; Panel Administrasi Bu Wati
+  </footer>
+</body>
+</html>

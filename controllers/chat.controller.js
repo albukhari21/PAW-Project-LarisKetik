@@ -7,16 +7,27 @@ const chatController = {
   handleChat: async (req, res) => {
     try {
       const message = req.sanitizedMessage || req.body.message;
+      const produkSlug = req.body.produkSlug ? String(req.body.produkSlug).trim() : null;
 
-      const result = await geminiService.generateChatReply(message);
+      const result = await geminiService.generateChatReply(message, produkSlug);
 
-      return res.status(200).json(formatResponse(true, 'Berhasil mendapatkan tanggapan dari Asisten AI', {
+      return res.status(200).json({
+        success: true,
+        message: 'Tanggapan asisten berhasil dibuat',
         reply: result.reply,
-        isConfigured: result.isConfigured
-      }));
+        data: {
+          reply: result.reply,
+          isConfigured: result.isConfigured
+        },
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
       console.error('[CHAT CONTROLLER ERROR]:', error.message);
-      return res.status(500).json(formatResponse(false, error.message || 'Terjadi kesalahan pada layanan AI Assistant'));
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Terjadi kesalahan pada layanan AI Assistant',
+        reply: 'Asisten sedang sibuk, coba lagi sebentar ya.'
+      });
     }
   }
 };

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-amber-50/20 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Navbar -->
+  <%- include('../partials/publicNav') %>
+
+  <main class="max-w-md mx-auto px-4 py-20 flex-1 w-full text-center space-y-4 my-auto">
+    <div class="text-6xl">🍵</div>
+    <span class="text-xs font-bold text-amber-700 uppercase tracking-widest block">404 - Halaman / Produk Tidak Ada</span>
+    <h1 class="text-2xl font-black text-emerald-950 tracking-tight">Racikan Jamu Tidak Ditemukan</h1>
+    <p class="text-xs text-slate-500 leading-relaxed">
+      <%= message || 'Halaman atau produk jamu yang Anda cari mungkin telah dipindahkan atau sudah tidak diproduksi lagi.' %>
+    </p>
+
+    <div class="pt-4 flex justify-center gap-3">
+      <a href="/katalog" class="px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition shadow-xs">
+        Buka Katalog Jamu
+      </a>
+      <a href="/" class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold transition">
+        Kembali ke Beranda
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer & Chatbot -->
+  <%- include('../partials/publicFooter') %>
+  <%- include('../partials/chatWidget') %>
+
+</body>
+</html>

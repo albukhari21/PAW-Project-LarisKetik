@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-amber-50/20 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Navbar -->
+  <%- include('../partials/publicNav') %>
+
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-b from-emerald-950 via-emerald-900 to-emerald-950 text-white overflow-hidden py-16 md:py-24 border-b border-emerald-800/60">
+    <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <!-- Kolom Teks Hero -->
+      <div class="space-y-6">
+        <div class="inline-flex items-center gap-2 bg-amber-400/20 border border-amber-300/30 text-amber-300 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
+          <span>🌿</span> 100% Rempah Asli Tradisional Indonesia
+        </div>
+
+        <h1 class="text-3xl md:text-5xl font-black text-amber-100 tracking-tight leading-tight">
+          Segarnya Khasiat Alami, Diracik untuk Gaya Hidup Sehat.
+        </h1>
+
+        <p class="text-sm md:text-base text-emerald-100/90 leading-relaxed max-w-xl">
+          Selamat datang di <strong class="text-amber-200">Seduh Rimba</strong>. Kami menghadirkan jamu kemasan siap minum, sachet seduh, dan serbuk murni dari rimpang pilihan petani lokal. Diracik higienis oleh Bu Wati tanpa pemanis buatan maupun pengawet sintetik.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <a href="/katalog" class="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black text-xs md:text-sm rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer">
+            <span>Lihat Semua Katalog Jamu</span>
+            <span>&rarr;</span>
+          </a>
+
+          <button onclick="toggleChatbot()" class="px-5 py-3 bg-emerald-800/80 hover:bg-emerald-800 border border-emerald-600/70 text-white font-bold text-xs md:text-sm rounded-xl transition flex items-center gap-2 cursor-pointer">
+            <span>🤖</span>
+            <span>Konsultasi dengan Asisten AI</span>
+          </button>
+        </div>
+
+        <!-- Mini Value Badges -->
+        <div class="pt-4 grid grid-cols-3 gap-4 border-t border-emerald-800/80 text-[11px] text-emerald-200">
+          <div>
+            <span class="block font-bold text-amber-300 text-sm">Resep Asli</span>
+            <span>Warisan Jawa Asli</span>
+          </div>
+          <div>
+            <span class="block font-bold text-amber-300 text-sm">Kemasan Steril</span>
+            <span>Botol & Sachet Higienis</span>
+          </div>
+          <div>
+            <span class="block font-bold text-amber-300 text-sm">Lokal Berdaya</span>
+            <span>Petani Rimpang DIY</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kolom Foto Hero / Ilustrasi -->
+      <div class="relative flex justify-center">
+        <div class="relative w-full max-w-md aspect-4/3 rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-800/60 bg-emerald-900">
+          <img 
+            src="https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80" 
+            alt="Seduh Rimba Kunyit Asam dan Rempah"
+            class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
+          >
+          <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-transparent to-transparent"></div>
+          <div class="absolute bottom-4 left-4 right-4 bg-emerald-950/85 backdrop-blur-md p-3.5 rounded-2xl border border-emerald-700/60 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-amber-300 font-bold uppercase tracking-wider block">Produk Terlaris</span>
+              <h4 class="font-bold text-xs text-white">Kunyit Asam Segar 250 ml</h4>
+            </div>
+            <a href="/produk/kunyit-asam-segar-250ml" class="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-[11px] rounded-lg transition">
+              Cek Jamu &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kategori Cepat -->
+  <section class="max-w-6xl mx-auto px-4 py-12 w-full">
+    <div class="text-center mb-8">
+      <span class="text-emerald-800 font-bold text-xs uppercase tracking-wider">Klasifikasi Jamu</span>
+      <h2 class="text-2xl font-black text-emerald-950 tracking-tight mt-1">Pilihan Format Sesuai Kebutuhan Anda</h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% categories.forEach(function(kat) { %>
+        <a href="/katalog?kategori=<%= kat.id %>" class="bg-white p-5 rounded-2xl border border-emerald-100 hover:border-emerald-600 shadow-2xs hover:shadow-md transition text-center group">
+          <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center text-xl group-hover:scale-110 transition">
+            <% if (kat.nama_kategori.toLowerCase().includes('botol')) { %>
+              🍾
+            <% } else if (kat.nama_kategori.toLowerCase().includes('sachet')) { %>
+              🍵
+            <% } else if (kat.nama_kategori.toLowerCase().includes('serbuk')) { %>
+              🥣
+            <% } else { %>
+              🎁
+            <% } %>
+          </div>
+          <h3 class="font-bold text-xs text-slate-800 group-hover:text-emerald-800"><%= kat.nama_kategori %></h3>
+          <p class="text-[11px] text-slate-400 mt-1 line-clamp-1"><%= kat.deskripsi || 'Lihat koleksi jamu' %></p>
+        </a>
+      <% }); %>
+    </div>
+  </section>
+
+  <!-- Produk Unggulan -->
+  <section class="bg-white py-14 border-y border-emerald-100 w-full">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
+        <div>
+          <span class="text-amber-700 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
+            <span>⭐</span> Paling Diminati
+          </span>
+          <h2 class="text-2xl font-black text-emerald-950 tracking-tight mt-1">Jamu Pilihan Unggulan</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Diracik segar setiap hari dengan bahan rimpang kualitas super.</p>
+        </div>
+        <a href="/katalog" class="text-xs font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 underline underline-offset-4">
+          Lihat Semua Produk Jamu &rarr;
+        </a>
+      </div>
+
+      <!-- Grid Produk Unggulan -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <% featuredProducts.forEach(function(item) { %>
+          <div class="bg-amber-50/20 rounded-2xl border border-emerald-100 overflow-hidden shadow-2xs hover:shadow-md transition flex flex-col group">
+            <!-- Foto Produk -->
+            <div class="relative aspect-4/3 bg-slate-100 overflow-hidden">
+              <img 
+                src="<%= item.foto_url %>" 
+                alt="<%= item.nama_produk %>"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                onerror="this.src='https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80'"
+              >
+              <span class="absolute top-2.5 left-2.5 bg-amber-400 text-emerald-950 text-[10px] font-black px-2 py-0.5 rounded-md shadow-xs">
+                Unggulan
+              </span>
+              <span class="absolute bottom-2.5 right-2.5 bg-emerald-950/80 text-white text-[10px] px-2 py-0.5 rounded-md backdrop-blur-xs">
+                <%= item.ukuran %>
+              </span>
+            </div>
+
+            <!-- Konten Kartu -->
+            <div class="p-4 flex-1 flex flex-col">
+              <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block mb-1">
+                <%= item.nama_kategori %>
+              </span>
+              <h3 class="font-bold text-xs text-slate-900 group-hover:text-emerald-800 transition line-clamp-1 mb-1">
+                <%= item.nama_produk %>
+              </h3>
+              <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed mb-3">
+                <%= item.manfaat_tradisional %>
+              </p>
+
+              <!-- Harga & CTA -->
+              <div class="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] text-slate-400 block">Harga:</span>
+                  <span class="font-black text-sm text-emerald-900"><%= formatRupiah(item.harga) %></span>
+                </div>
+                <a href="/produk/<%= item.slug %>" class="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl transition">
+                  Detail &rarr;
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mengapa Memilih Seduh Rimba -->
+  <section class="max-w-6xl mx-auto px-4 py-16 w-full">
+    <div class="text-center mb-10 max-w-2xl mx-auto">
+      <span class="text-emerald-800 font-bold text-xs uppercase tracking-wider">Komitmen Kualitas</span>
+      <h2 class="text-2xl font-black text-emerald-950 tracking-tight mt-1">Mengapa Jamu Seduh Rimba Berbeda?</h2>
+      <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+        Kami merawat warisan jamu nusantara agar tetap relevan, higienis, dan nyaman dikonsumsi generasi masa kini.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-2xs space-y-3">
+        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-2xl font-bold">
+          🌾
+        </div>
+        <h3 class="font-bold text-sm text-emerald-950">100% Rempah Segar Pilihan</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Kunyit, kencur, jahe merah, dan temulawak dipanen dari tanah vulkanik Jawa yang subur tanpa pestisida kimia berlebih.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-2xs space-y-3">
+        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl font-bold">
+          🍯
+        </div>
+        <h3 class="font-bold text-sm text-emerald-950">Gula Alami Tanpa Pengawet</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Menggunakan gula aren organik dan madu hutan murni sebagai pemanis alami. Tanpa sodium benzoat atau pemanis buatan.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-2xs space-y-3">
+        <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-2xl font-bold">
+          🤖
+        </div>
+        <h3 class="font-bold text-sm text-emerald-950">Terintegrasi Asisten AI</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Bingung memilih jamu yang tepat? Asisten AI Seduh Rimba siap menjawab keamanan konsumsi dan komposisi secara langsung.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Banner Ajakan Konsultasi -->
+  <section class="bg-emerald-900 text-white py-12 border-t border-emerald-800 w-full">
+    <div class="max-w-4xl mx-auto px-4 text-center space-y-4">
+      <span class="text-amber-300 font-bold text-xs uppercase tracking-wider block">Konsultasi Ramah Pelanggan</span>
+      <h2 class="text-2xl md:text-3xl font-black text-amber-100">Punya Pertanyaan Seputar Jamu atau Pesanan?</h2>
+      <p class="text-xs md:text-sm text-emerald-200 leading-relaxed max-w-xl mx-auto">
+        Tanyakan kepada Asisten AI toko kami 24/7 atau pesan langsung ke WhatsApp Bu Wati untuk pemesanan jumlah banyak / hampers.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 pt-2">
+        <button onclick="toggleChatbot()" class="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs rounded-xl shadow-md transition cursor-pointer">
+          💬 Tanya Asisten AI Toko
+        </button>
+        <a href="https://wa.me/<%= whatsappNumber %>?text=Halo%20Seduh%20Rimba,%20saya%20ingin%20bertanya%20seputar%20produk%20jamu" target="_blank" class="px-5 py-2.5 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl border border-emerald-600 transition flex items-center gap-2">
+          <span>📲 Chat WhatsApp Bu Wati</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer & Chatbot -->
+  <%- include('../partials/publicFooter') %>
+  <%- include('../partials/chatWidget') %>
+
+</body>
+</html>

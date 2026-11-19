@@ -1,0 +1,73 @@
+<!-- Navbar Publik Seduh Rimba -->
+<header class="bg-emerald-950/95 backdrop-blur-md text-emerald-50 sticky top-0 z-40 border-b border-emerald-900/60 shadow-sm">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <!-- Brand Logo -->
+    <a href="/" class="flex items-center gap-2.5 group">
+      <span class="text-2xl transition group-hover:scale-110">🌿</span>
+      <div>
+        <span class="font-black text-lg text-amber-200 tracking-tight block leading-tight">Seduh Rimba</span>
+        <span class="text-[10px] text-emerald-300 font-medium tracking-wider block">Jamu & Minuman Herbal Alami</span>
+      </div>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex items-center gap-2 text-xs font-semibold">
+      <a href="/" class="px-3 py-2 rounded-xl transition <%= currentPath === '/' ? 'bg-emerald-800/80 text-white font-bold' : 'text-emerald-200 hover:text-white hover:bg-emerald-900/60' %>">
+        Beranda
+      </a>
+      <a href="/katalog" class="px-3 py-2 rounded-xl transition <%= currentPath === '/katalog' ? 'bg-emerald-800/80 text-white font-bold' : 'text-emerald-200 hover:text-white hover:bg-emerald-900/60' %>">
+        Katalog Produk
+      </a>
+      <a href="/tentang" class="px-3 py-2 rounded-xl transition <%= currentPath === '/tentang' ? 'bg-emerald-800/80 text-white font-bold' : 'text-emerald-200 hover:text-white hover:bg-emerald-900/60' %>">
+        Tentang Kami
+      </a>
+      
+      <div class="h-4 w-[1px] bg-emerald-800 mx-2"></div>
+
+      <!-- Tombol Tanya Asisten AI (membuka widget chat) -->
+      <button onclick="toggleChatbot()" class="px-3 py-2 rounded-xl bg-amber-400/20 text-amber-300 hover:bg-amber-400/30 transition flex items-center gap-1.5 cursor-pointer">
+        <span>🤖</span>
+        <span>Asisten AI Toko</span>
+      </button>
+
+      <!-- Akses Admin Bu Wati -->
+      <a href="/admin" class="px-3 py-1.5 rounded-xl border border-emerald-700/60 text-emerald-300 hover:text-white hover:bg-emerald-900 transition flex items-center gap-1 text-[11px]">
+        <span>🔐</span>
+        <span>Panel Pemilik</span>
+      </a>
+    </nav>
+
+    <!-- Mobile Menu Button -->
+    <button onclick="toggleMobileNav()" class="md:hidden p-2 rounded-xl hover:bg-emerald-900 text-emerald-200 cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile Dropdown Menu -->
+  <div id="mobileNav" class="hidden md:hidden px-4 pb-4 pt-2 bg-emerald-950 border-t border-emerald-900 text-xs font-semibold space-y-1.5">
+    <a href="/" class="block px-3 py-2 rounded-lg <%= currentPath === '/' ? 'bg-emerald-800 text-white' : 'text-emerald-200 hover:bg-emerald-900' %>">
+      Beranda
+    </a>
+    <a href="/katalog" class="block px-3 py-2 rounded-lg <%= currentPath === '/katalog' ? 'bg-emerald-800 text-white' : 'text-emerald-200 hover:bg-emerald-900' %>">
+      Katalog Produk
+    </a>
+    <a href="/tentang" class="block px-3 py-2 rounded-lg <%= currentPath === '/tentang' ? 'bg-emerald-800 text-white' : 'text-emerald-200 hover:bg-emerald-900' %>">
+      Tentang Kami
+    </a>
+    <button onclick="toggleChatbot(); toggleMobileNav();" class="w-full text-left px-3 py-2 rounded-lg bg-amber-400/20 text-amber-300 flex items-center gap-2">
+      <span>🤖</span> Tanya Asisten AI
+    </button>
+    <a href="/admin" class="block px-3 py-2 rounded-lg text-emerald-300 border border-emerald-800">
+      🔐 Panel Pemilik (Bu Wati)
+    </a>
+  </div>
+</header>
+
+<script>
+  function toggleMobileNav() {
+    const nav = document.getElementById('mobileNav');
+    nav.classList.toggle('hidden');
+  }
+</script>

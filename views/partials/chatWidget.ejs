@@ -1,0 +1,252 @@
+<!-- Floating Chatbot Widget (Asisten Pembeli Seduh Rimba) -->
+<div id="chatWidgetContainer" class="fixed bottom-5 right-5 z-50 font-sans">
+  <!-- Tombol Melayang Buka Chat -->
+  <button id="chatToggleBtn" onclick="toggleChatbot()" class="bg-emerald-800 hover:bg-emerald-900 text-white p-3.5 rounded-full shadow-2xl flex items-center justify-center transition transform hover:scale-105 border-2 border-amber-300/40 cursor-pointer group">
+    <div class="relative">
+      <span class="text-2xl">🌿</span>
+      <span class="absolute -top-1 -right-1 text-[10px] bg-amber-400 text-emerald-950 font-bold px-1.5 py-0.2 rounded-full">AI</span>
+    </div>
+    <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 text-xs font-bold pl-0 group-hover:pl-2">
+      Tanya Asisten Jamu
+    </span>
+  </button>
+
+  <!-- Box Jendela Chatbot -->
+  <div id="chatWindow" class="hidden flex-col w-[92vw] sm:w-96 h-[500px] max-h-[80vh] bg-white rounded-2xl shadow-2xl border border-emerald-200 overflow-hidden transition-all duration-300">
+    <!-- Header Chatbot -->
+    <div class="bg-emerald-900 text-white px-4 py-3 flex items-center justify-between shadow-xs">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-emerald-800 flex items-center justify-center text-base border border-amber-300/30">
+          🤖
+        </div>
+        <div>
+          <h4 class="font-bold text-xs text-amber-200 tracking-tight">Asisten Toko Seduh Rimba</h4>
+          <span class="text-[10px] text-emerald-300 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Siap membantu seputar jamu herbal
+          </span>
+        </div>
+      </div>
+      <button onclick="toggleChatbot()" class="text-emerald-300 hover:text-white p-1 rounded-lg text-lg leading-none cursor-pointer">
+        &times;
+      </button>
+    </div>
+
+    <!-- Banner Konteks Produk (Aktif jika dibuka dari halaman detail) -->
+    <div id="chatProductContextBanner" class="hidden bg-amber-50 border-b border-amber-200 px-3 py-1.5 text-[11px] text-amber-900 flex items-center justify-between">
+      <span id="chatProductContextText" class="truncate font-medium">Konteks: Produk</span>
+      <button onclick="clearProductContext()" class="text-amber-700 hover:text-amber-950 text-xs font-bold underline ml-2 cursor-pointer">
+        Hapus
+      </button>
+    </div>
+
+    <!-- Area Pesan Chat -->
+    <div id="chatMessages" class="flex-1 p-3.5 overflow-y-auto space-y-3 bg-slate-50/50 text-xs">
+      <!-- Pesan Sambutan Awal -->
+      <div class="flex items-start gap-2">
+        <div class="w-6 h-6 rounded-full bg-emerald-800 text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">
+          🌿
+        </div>
+        <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-emerald-100 shadow-2xs text-slate-700 space-y-1.5 leading-relaxed max-w-[85%]">
+          <p class="font-semibold text-emerald-950">Sugeng rawuh! Ada yang bisa saya bantu?</p>
+          <p class="text-[11px] text-slate-600">
+            Saya asisten toko herbal Seduh Rimba. Anda dapat bertanya tentang khasiat rempah, rekomendasi jamu, komposisi, atau cara penyimpanan.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Suggestion Chips -->
+      <div id="quickChips" class="space-y-1.5 pt-1">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Saran Pertanyaan:</span>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="sendQuickPrompt('Rekomendasi jamu untuk menyegarkan badan setelah kerja?')" class="chip-btn text-[11px] bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-xl transition text-left cursor-pointer">
+            ✨ Rekomendasi jamu segar
+          </button>
+          <button onclick="sendQuickPrompt('Apa bedanya Beras Kencur dan Kunyit Asam?')" class="chip-btn text-[11px] bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-xl transition text-left cursor-pointer">
+            🍵 Beda Beras Kencur vs Kunyit Asam
+          </button>
+          <button onclick="sendQuickPrompt('Berapa lama daya simpan jamu botol di kulkas?')" class="chip-btn text-[11px] bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-xl transition text-left cursor-pointer">
+            ❄️ Cara simpan jamu botol
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indikator Mengetik -->
+    <div id="typingIndicator" class="hidden px-4 py-1.5 bg-slate-50/80 border-t border-slate-100 text-[11px] text-emerald-700 flex items-center gap-2">
+      <div class="flex gap-1">
+        <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce"></span>
+        <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce" style="animation-delay: 0.15s"></span>
+        <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
+      </div>
+      <span>Asisten Seduh Rimba sedang meracik jawaban...</span>
+    </div>
+
+    <!-- Input Form -->
+    <form id="chatForm" onsubmit="handleChatSubmit(event)" class="p-2.5 bg-white border-t border-slate-200">
+      <div class="flex items-center gap-1.5 bg-slate-100 rounded-xl px-3 py-1.5 border border-slate-200 focus-within:ring-2 focus-within:ring-emerald-600 focus-within:bg-white">
+        <input 
+          type="text" 
+          id="chatInput" 
+          maxlength="500"
+          placeholder="Tanyakan tentang jamu kami..." 
+          class="flex-1 bg-transparent text-xs text-slate-800 outline-none"
+          autocomplete="off"
+        >
+        <button type="submit" id="chatSendBtn" class="text-emerald-800 hover:text-emerald-950 font-bold text-xs p-1 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+        </button>
+      </div>
+      <div class="flex justify-between items-center px-1 pt-1 text-[9px] text-slate-400">
+        <span>Informasi herbal disajikan secara tradisional</span>
+        <span id="charCount">0/500</span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let activeProductSlug = null;
+  let activeProductName = null;
+
+  function toggleChatbot() {
+    const chatWin = document.getElementById('chatWindow');
+    const toggleBtn = document.getElementById('chatToggleBtn');
+    if (chatWin.classList.contains('hidden')) {
+      chatWin.classList.remove('hidden');
+      chatWin.classList.add('flex');
+      toggleBtn.classList.add('hidden');
+      document.getElementById('chatInput').focus();
+    } else {
+      chatWin.classList.add('hidden');
+      chatWin.classList.remove('flex');
+      toggleBtn.classList.remove('hidden');
+    }
+  }
+
+  function setProductContext(slug, name) {
+    activeProductSlug = slug;
+    activeProductName = name;
+    const banner = document.getElementById('chatProductContextBanner');
+    const text = document.getElementById('chatProductContextText');
+    text.textContent = 'Konteks pertanyaan: ' + name;
+    banner.classList.remove('hidden');
+  }
+
+  function clearProductContext() {
+    activeProductSlug = null;
+    activeProductName = null;
+    const banner = document.getElementById('chatProductContextBanner');
+    banner.classList.add('hidden');
+  }
+
+  window.openChatWithProduct = function(slug, name) {
+    setProductContext(slug, name);
+    const chatWin = document.getElementById('chatWindow');
+    if (chatWin.classList.contains('hidden')) {
+      toggleChatbot();
+    }
+    // Prefill sapaan
+    const input = document.getElementById('chatInput');
+    input.value = `Bisakah jelaskan khasiat dan keamanan konsumsi untuk ${name}?`;
+    input.focus();
+  };
+
+  // Helper Sanitasi XSS
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.innerText = str;
+    return div.innerHTML;
+  }
+
+  // Format link wa.me dan bolding sederhana
+  function formatReply(text) {
+    let clean = escapeHtml(text);
+    clean = clean.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    clean = clean.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    clean = clean.replace(/\n/g, '<br>');
+    return clean;
+  }
+
+  function appendMessage(sender, message) {
+    const container = document.getElementById('chatMessages');
+    const msgDiv = document.createElement('div');
+
+    if (sender === 'user') {
+      msgDiv.className = 'flex justify-end';
+      msgDiv.innerHTML = `
+        <div class="bg-emerald-800 text-white p-3 rounded-2xl rounded-tr-none text-xs leading-relaxed max-w-[85%] shadow-xs">
+          ${escapeHtml(message)}
+        </div>
+      `;
+    } else {
+      msgDiv.className = 'flex items-start gap-2';
+      msgDiv.innerHTML = `
+        <div class="w-6 h-6 rounded-full bg-emerald-800 text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">
+          🌿
+        </div>
+        <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-emerald-100 shadow-2xs text-slate-700 leading-relaxed max-w-[85%]">
+          ${formatReply(message)}
+        </div>
+      `;
+    }
+
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function sendQuickPrompt(promptText) {
+    document.getElementById('chatInput').value = promptText;
+    document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+  }
+
+  const inputEl = document.getElementById('chatInput');
+  const countEl = document.getElementById('charCount');
+  inputEl.addEventListener('input', () => {
+    countEl.textContent = `${inputEl.value.length}/500`;
+  });
+
+  async function handleChatSubmit(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMessage('user', message);
+    input.value = '';
+    countEl.textContent = '0/500';
+
+    // Sembunyikan quick chips setelah pesan pertama
+    const chips = document.getElementById('quickChips');
+    if (chips) chips.style.display = 'none';
+
+    // Tampilkan indikator mengetik
+    const typing = document.getElementById('typingIndicator');
+    typing.classList.remove('hidden');
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: message,
+          produkSlug: activeProductSlug
+        })
+      });
+
+      const data = await response.json();
+      typing.classList.add('hidden');
+
+      if (data.success && data.reply) {
+        appendMessage('bot', data.reply);
+      } else {
+        appendMessage('bot', data.message || 'Maaf, asisten sedang sibuk menyiapkan racikan informasi. Silakan coba sesaat lagi.');
+      }
+    } catch (err) {
+      typing.classList.add('hidden');
+      appendMessage('bot', 'Koneksi asisten terputus. Pastikan koneksi internet Anda aktif dan coba kembali.');
+    }
+  }
+</script>

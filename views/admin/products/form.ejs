@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-amber-50/30 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <%- include('../../partials/adminNav') %>
+
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full">
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <a href="/admin/produk" class="text-xs text-emerald-700 hover:text-emerald-900 font-bold inline-flex items-center gap-1 mb-2">
+          ← Kembali ke Daftar Produk
+        </a>
+        <h1 class="text-2xl font-black text-emerald-950 tracking-tight">
+          <%= isEdit ? 'Ubah Data Produk Jamu' : 'Tambah Produk Jamu Baru' %>
+        </h1>
+        <p class="text-xs text-slate-500 mt-1">Lengkapi data rincian racikan herbal untuk katalog toko Seduh Rimba.</p>
+      </div>
+    </div>
+
+    <!-- Alert Error -->
+    <% if (error) { %>
+      <div class="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs font-semibold flex items-center gap-2 shadow-xs">
+        <span class="text-base">⚠️</span>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <!-- Form Container -->
+    <div class="bg-white rounded-3xl shadow-xs border border-emerald-100 p-6 sm:p-8">
+      <form action="<%= isEdit ? '/admin/produk/edit/' + product.id : '/admin/produk/tambah' %>" method="POST" enctype="multipart/form-data" class="space-y-6">
+        
+        <!-- Bagian 1: Informasi Dasar -->
+        <div>
+          <h3 class="text-xs font-bold text-emerald-900 uppercase tracking-wider mb-3 pb-2 border-b border-emerald-100 flex items-center gap-1.5">
+            <span>📦</span> <span>Informasi Pokok Produk</span>
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Nama Produk Jamu <span class="text-rose-500">*</span></label>
+              <input type="text" name="nama_produk" id="inputNama" required value="<%= product.nama_produk || '' %>" placeholder="Contoh: Kunyit Asam Segar 250 ml" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Kategori <span class="text-rose-500">*</span></label>
+              <select name="kategori_id" required class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+                <option value="">Pilih Kategori</option>
+                <% categories.forEach(function(kat) { %>
+                  <option value="<%= kat.id %>" <%= String(product.kategori_id) === String(kat.id) ? 'selected' : '' %>>
+                    <%= kat.nama_kategori %>
+                  </option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Slug URL (Opsional)</label>
+              <input type="text" name="slug" value="<%= product.slug || '' %>" placeholder="otomatis-dibuat-dari-nama" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none font-mono">
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Biarkan kosong untuk generate otomatis</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Harga Jual (Rp) <span class="text-rose-500">*</span></label>
+              <input type="number" step="0.01" min="1" name="harga" required value="<%= product.harga || '' %>" placeholder="14000" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none font-bold text-emerald-800">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Ukuran / Satuan Kemasan <span class="text-rose-500">*</span></label>
+              <input type="text" name="ukuran" required value="<%= product.ukuran || 'Botol 250 ml' %>" placeholder="Contoh: Botol 250 ml / Isi 10 sachet" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Stok <span class="text-rose-500">*</span></label>
+              <input type="number" min="0" name="stok" required value="<%= product.stok !== undefined ? product.stok : 20 %>" placeholder="20" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Status Publikasi</label>
+              <select name="status" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+                <option value="aktif" <%= product.status === 'aktif' || !product.status ? 'selected' : '' %>>Aktif (Tampil di Katalog)</option>
+                <option value="nonaktif" <%= product.status === 'nonaktif' ? 'selected' : '' %>>Nonaktif (Disembunyikan)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bagian 2: Khasiat & Komposisi Herbal -->
+        <div>
+          <h3 class="text-xs font-bold text-emerald-900 uppercase tracking-wider mb-3 pb-2 border-b border-emerald-100 flex items-center gap-1.5">
+            <span>🌿</span> <span>Rincian Herbal & Edukasi Pelanggan</span>
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Deskripsi Ringkas Produk <span class="text-rose-500">*</span></label>
+              <textarea name="deskripsi" rows="2" required placeholder="Jelaskan daya tarik jamu ini..." class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none"><%= product.deskripsi || '' %></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Komposisi Bahan Alami <span class="text-rose-500">*</span></label>
+              <textarea name="komposisi" rows="2" required placeholder="Contoh: Rimpang kunyit segar, asam jawa matang, gula aren murni, air mineral." class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none"><%= product.komposisi || '' %></textarea>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700">Manfaat Tradisional <span class="text-rose-500">*</span></label>
+                <span class="text-[10px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md">Wajib awali "Secara tradisional..."</span>
+              </div>
+              <textarea name="manfaat_tradisional" rows="2" required placeholder="Secara tradisional dipercaya membantu menyegarkan badan, meredakan pegal linu..." class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none"><%= product.manfaat_tradisional || '' %></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Cita Rasa & Aroma <span class="text-rose-500">*</span></label>
+                <input type="text" name="rasa" required value="<%= product.rasa || 'Asam manis menyegarkan' %>" placeholder="Contoh: Asam manis segar dengan aroma kunyit asli" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Masa Simpan <span class="text-rose-500">*</span></label>
+                <input type="text" name="masa_simpan" required value="<%= product.masa_simpan || '7 hari di kulkas' %>" placeholder="Contoh: 7 hari di dalam lemari es" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Cara Penyajian <span class="text-rose-500">*</span></label>
+                <input type="text" name="cara_penyajian" required value="<%= product.cara_penyajian || 'Kocok perlahan sebelum diminum. Sajikan dingin.' %>" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Cara Penyimpanan <span class="text-rose-500">*</span></label>
+                <input type="text" name="cara_penyimpanan" required value="<%= product.cara_penyimpanan || 'Simpan di dalam kulkas pada suhu 2°C - 6°C' %>" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Peringatan Konsumsi <span class="text-rose-500">*</span></label>
+              <input type="text" name="peringatan" required value="<%= product.peringatan || 'Tidak dianjurkan untuk ibu hamil tanpa konsultasi tenaga kesehatan.' %>" placeholder="Contoh: Tidak dianjurkan untuk ibu hamil..." class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Bagian 3: Foto & Fitur Unggulan -->
+        <div>
+          <h3 class="text-xs font-bold text-emerald-900 uppercase tracking-wider mb-3 pb-2 border-b border-emerald-100 flex items-center gap-1.5">
+            <span>🖼️</span> <span>Foto & Tampilan</span>
+          </h3>
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Upload File Foto (Maks 2MB)</label>
+                <input type="file" name="foto_file" accept="image/png, image/jpeg, image/jpg, image/webp" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Atau Masukkan URL Foto Eksternal</label>
+                <input type="url" name="foto_url" value="<%= product.foto_url || '' %>" placeholder="https://images.unsplash.com/..." class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none">
+              </div>
+            </div>
+
+            <% if (product.foto_url) { %>
+              <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <img src="<%= product.foto_url %>" alt="Preview Foto" class="w-14 h-14 rounded-lg object-cover border" onerror="this.src='https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=150&q=80'">
+                <div>
+                  <span class="text-xs font-bold text-slate-700 block">Foto Saat Ini</span>
+                  <span class="text-[10px] text-slate-400 break-all"><%= product.foto_url %></span>
+                </div>
+              </div>
+            <% } %>
+
+            <div class="pt-2">
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="is_unggulan" value="true" <%= product.is_unggulan ? 'checked' : '' %> class="w-4 h-4 text-emerald-700 rounded border-slate-300 focus:ring-emerald-500">
+                <span class="text-xs font-bold text-slate-700">Tampilkan sebagai Produk Unggulan ⭐ di Beranda Toko</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi Simpan -->
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+          <a href="/admin/produk" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+            Batal
+          </a>
+          <button type="submit" class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <span>💾 Simpan Produk Jamu</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-emerald-100 py-5 text-center text-xs text-slate-400">
+    <p>Seduh Rimba &copy; 2026 - Panel Manajemen Toko Jamu Tradisional Bu Wati</p>
+  </footer>
+
+</body>
+</html>

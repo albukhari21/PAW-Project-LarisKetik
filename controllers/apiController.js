@@ -7,9 +7,9 @@ const apiController = {
   getStatus: async (req, res) => {
     try {
       await ProductModel.getAll();
-      res.status(200).json(formatResponse(true, "Server & Database LarisKetik berjalan normal", {
+      res.status(200).json(formatResponse(true, "Server & Database Seduh Rimba berjalan normal", {
         status: "Healthy / Online",
-        database: "MySQL (larisketik_db) Terhubung",
+        database: "PostgreSQL (seduh_rimba_db) Terhubung",
         uptime: process.uptime()
       }));
     } catch (error) {

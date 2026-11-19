@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-amber-50/20 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Navbar -->
+  <%- include('../partials/publicNav') %>
+
+  <!-- Header Katalog -->
+  <div class="bg-emerald-950 text-white py-10 border-b border-emerald-900">
+    <div class="max-w-6xl mx-auto px-4 text-center space-y-2">
+      <span class="text-amber-300 font-bold text-xs uppercase tracking-wider">Koleksi Herbal Alami</span>
+      <h1 class="text-3xl font-black text-amber-100 tracking-tight">Katalog Jamu Tradisional Seduh Rimba</h1>
+      <p class="text-xs text-emerald-200/90 max-w-lg mx-auto">
+        Temukan jamu segar botol, ramuan seduh celup/sachet, hingga serbuk murni untuk menjaga kebugaran tubuh setiap hari.
+      </p>
+    </div>
+  </div>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
+    <!-- Filter Kategori & Pencarian Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-2xs mb-8 space-y-4">
+      <!-- Search Form -->
+      <form action="/katalog" method="GET" class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <input 
+            type="text" 
+            name="search" 
+            value="<%= search %>" 
+            placeholder="Cari nama jamu, komposisi (kunyit, jahe...), atau khasiat..."
+            class="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:bg-white outline-none"
+          >
+          <span class="absolute left-3.5 top-3 text-slate-400 text-xs">🔍</span>
+          <% if (kategori_id) { %>
+            <input type="hidden" name="kategori" value="<%= kategori_id %>">
+          <% } %>
+        </div>
+
+        <button type="submit" class="px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition cursor-pointer">
+          Cari Jamu
+        </button>
+
+        <% if (search || kategori_id) { %>
+          <a href="/katalog" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold text-center transition">
+            Reset Filter
+          </a>
+        <% } %>
+      </form>
+
+      <!-- Category Filter Pills -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 pt-1 text-xs">
+        <span class="text-slate-400 font-medium text-[11px] shrink-0">Kategori:</span>
+        <a 
+          href="/katalog<%= search ? '?search=' + encodeURIComponent(search) : '' %>"
+          class="px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition <%= !kategori_id ? 'bg-emerald-800 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
+          Semua Jamu
+        </a>
+        <% categories.forEach(function(kat) { %>
+          <a 
+            href="/katalog?kategori=<%= kat.id %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
+            class="px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition <%= String(kategori_id) === String(kat.id) ? 'bg-emerald-800 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
+            <%= kat.nama_kategori %>
+          </a>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Info Jumlah & Hasil Filter -->
+    <div class="flex items-center justify-between mb-6 text-xs text-slate-500">
+      <p>
+        Menampilkan <strong class="text-emerald-950 font-bold"><%= products.length %></strong> produk jamu aktif
+        <% if (search) { %> untuk kata kunci "<em><%= search %></em>"<% } %>
+      </p>
+      <button onclick="toggleChatbot()" class="text-emerald-800 hover:underline font-semibold flex items-center gap-1 cursor-pointer">
+        <span>🤖 Butuh bantuan memilih?</span>
+      </button>
+    </div>
+
+    <!-- Product Grid -->
+    <% if (products.length === 0) { %>
+      <div class="bg-white rounded-3xl border border-dashed border-emerald-200 p-12 text-center max-w-lg mx-auto shadow-2xs space-y-3">
+        <div class="text-4xl">🍃</div>
+        <h3 class="font-bold text-base text-emerald-950">Produk Jamu Tidak Ditemukan</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Tidak ada jamu yang sesuai dengan filter atau kata kunci pencarian Anda. Silakan coba kata kunci lain seperti "kunyit", "jahe", atau telusuri semua kategori.
+        </p>
+        <div class="pt-2">
+          <a href="/katalog" class="inline-block px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition">
+            Lihat Semua Produk
+          </a>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <% products.forEach(function(item) { %>
+          <div class="bg-white rounded-2xl border border-emerald-100 overflow-hidden shadow-2xs hover:shadow-md transition flex flex-col group">
+            <!-- Foto Produk & Badges -->
+            <div class="relative aspect-4/3 bg-slate-100 overflow-hidden">
+              <img 
+                src="<%= item.foto_url %>" 
+                alt="<%= item.nama_produk %>"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                onerror="this.src='https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80'"
+              >
+              <% if (item.is_unggulan) { %>
+                <span class="absolute top-2.5 left-2.5 bg-amber-400 text-emerald-950 text-[10px] font-black px-2 py-0.5 rounded-md shadow-xs">
+                  ⭐ Unggulan
+                </span>
+              <% } %>
+
+              <!-- Label Stok -->
+              <div class="absolute bottom-2.5 left-2.5">
+                <% if (item.stok <= 0) { %>
+                  <span class="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                    Stok Habis
+                  </span>
+                <% } else if (item.stok < 10) { %>
+                  <span class="bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                    Sisa <%= item.stok %>
+                  </span>
+                <% } else { %>
+                  <span class="bg-emerald-700/90 text-white text-[10px] font-medium px-2 py-0.5 rounded-md backdrop-blur-xs">
+                    Stok: <%= item.stok %>
+                  </span>
+                <% } %>
+              </div>
+
+              <span class="absolute bottom-2.5 right-2.5 bg-emerald-950/80 text-white text-[10px] px-2 py-0.5 rounded-md backdrop-blur-xs">
+                <%= item.ukuran %>
+              </span>
+            </div>
+
+            <!-- Rincian Produk -->
+            <div class="p-4 flex-1 flex flex-col">
+              <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block mb-1">
+                <%= item.nama_kategori %>
+              </span>
+              <a href="/produk/<%= item.slug %>" class="block">
+                <h3 class="font-bold text-sm text-slate-900 group-hover:text-emerald-800 transition line-clamp-1 mb-1">
+                  <%= item.nama_produk %>
+                </h3>
+              </a>
+
+              <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed mb-3">
+                <%= item.manfaat_tradisional %>
+              </p>
+
+              <div class="text-[10px] text-slate-400 mb-3 flex items-center gap-1">
+                <span>Rasa:</span>
+                <span class="font-semibold text-slate-600 truncate"><%= item.rasa %></span>
+              </div>
+
+              <!-- Harga & Aksi -->
+              <div class="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div>
+                  <span class="text-[10px] text-slate-400 block leading-tight">Harga:</span>
+                  <span class="font-black text-sm text-emerald-900"><%= formatRupiah(item.harga) %></span>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                  <a 
+                    href="https://wa.me/<%= whatsappNumber %>?text=Halo%20Seduh%20Rimba,%20saya%20tertarik%20dengan%20produk%20*<%= encodeURIComponent(item.nama_produk) %>*%20harga%20<%= encodeURIComponent(formatRupiah(item.harga)) %>"
+                    target="_blank"
+                    title="Pesan via WhatsApp"
+                    class="p-2 text-emerald-700 hover:text-white bg-emerald-50 hover:bg-emerald-600 border border-emerald-200 rounded-xl transition cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                  </a>
+                  <a href="/produk/<%= item.slug %>" class="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl transition">
+                    Lihat Detail
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </main>
+
+  <!-- Footer & Chatbot -->
+  <%- include('../partials/publicFooter') %>
+  <%- include('../partials/chatWidget') %>
+
+</body>
+</html>
